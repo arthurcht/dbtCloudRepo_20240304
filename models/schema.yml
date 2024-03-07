@@ -7,14 +7,15 @@ sources:
     tables:
       - name: raw_transactions
 
-
 models:
-    - name: fct_transactions.sql
-      description: "Fact table of transactions"
-      columns:
-          - name: transaction_id
-            description: "The primary key for this table"
-            tests:
-                - unique
-                - not_null
-          - name: customer_id
+  - name: fct_transactions
+    description: "Fact table of transactions"
+    columns:
+        - name: transaction_id
+          description: "The primary key for this table"
+          tests:
+            - unique
+            - not_null
+        - name: customer_id
+          tests:
+            - unique

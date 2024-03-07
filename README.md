@@ -40,8 +40,43 @@ pip install -r requirements.txt
         INSERT INTO "dbtSchema_Arthur20240304".raw_transactions (customer_id, transaction_id)
         VALUES
             (1, '0023'),
-            (4, '1034');
+            (4, '1034'),
+            (1, NULL)
         ```
+
+- In `models` folder,
+    - create `schema.yml` that defines sources and models (optionally add tests for model's columns, and expect it to fail!)
+    ```
+    version: 2
+
+    sources:
+    - name: dbtSchema_Arthur20240304
+        database: postgres
+        schema: dbtSchema_Arthur20240304
+        tables:
+        - name: raw_transactions
+
+    models:
+        - name: fct_transactions
+        description: "Fact table of transactions"
+        columns:
+            - name: transaction_id
+                description: "The primary key for this table"
+                tests:
+                - unique
+                - not_null
+            - name: customer_id
+                tests:
+                - unique
+    ```
+
+    - create models e.g. fct_transactions.sql
+    ```
+    select *
+    from {{ source('dbtSchema_Arthur20240304', 'raw_transactions')}}
+    ```
+
+- Run `dbt build` to run models and tests, or `dbt test` to run tests only
 
 ### Using the starter project
 
