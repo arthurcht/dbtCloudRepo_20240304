@@ -1,5 +1,18 @@
 Welcome to your new dbt project!
 
+### to run locally, using dbtCore
+- Create virtual environment and activate it
+```
+python3 -m venv .venv # create a virtual environment
+```
+
+- Install project requirements.txt into virtual environment:
+```
+python3 -m pip install -r requirements.txt # install the project's requirements
+# if above doesn't work, run without python3 -m...
+pip install -r requirements.txt
+```
+
 ### Using the starter project
 
 Try running the following commands:
