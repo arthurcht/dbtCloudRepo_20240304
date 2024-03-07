@@ -1,17 +1,27 @@
 Welcome to your new dbt project!
 
-### to run locally, using dbtCore
+### Setup to run locally (using dbt Core)
 - Create virtual environment and activate it
 ```
 python3 -m venv .venv # create a virtual environment
 ```
 
-- Install project requirements.txt into virtual environment:
+- NOTE: This project uses Postgres as data warehouse, so adapter `dbt-postgres` installed. See (setup instructions)[https://docs.getdbt.com/docs/core/connect-data-platform/postgres-setup] for other data warehouses.
+
+- Install project `requirements.txt` into virtual environment:
+    - in `requirements.txt`, replace `dbt-postgres` adapter package if not using Postgres
 ```
 python3 -m pip install -r requirements.txt # install the project's requirements
 # if above doesn't work, run without python3 -m...
 pip install -r requirements.txt
 ```
+
+- Setup `profiles.yml` to connect to data warehouse
+    - DO NOT VERSION CONTROL SENSITIVE INFO! see (`profiles.yml` best practices)[https://docs.getdbt.com/docs/core/connect-data-platform/connection-profiles]
+    - if not using Postgres, see (setup instructions)[https://docs.getdbt.com/docs/core/connect-data-platform/postgres-setup] for other data warehouses
+
+- (optional) Run `dbt debug`, expect final message `All checks passed!` 
+    - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud
 
 ### Using the starter project
 

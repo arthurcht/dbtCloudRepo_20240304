@@ -1,0 +1,12 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      user: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      password: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      port: 5432
+      dbname: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      schema: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      threads: 4
