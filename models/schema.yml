@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: dbtSchema_Arthur20240304
+    database: postgres
+    schema: dbtSchema_Arthur20240304
+    tables:
+      - name: raw_transactions
+
+
+models:
+    - name: fct_transactions.sql
+      description: "Fact table of transactions"
+      columns:
+          - name: transaction_id
+            description: "The primary key for this table"
+            tests:
+                - unique
+                - not_null
+          - name: customer_id

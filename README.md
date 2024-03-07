@@ -23,6 +23,26 @@ pip install -r requirements.txt
 - (optional) Run `dbt debug`, expect final message `All checks passed!` 
     - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud
 
+### Testing Elementary
+- Load data into data warehouse
+    - for BigQuery, Databricks, Redshift or Snowflake, see (guides)[https://courses.getdbt.com/courses/take/fundamentals/texts/43380412-setting-up-dbt-cloud-and-your-data-platform]
+    - for Postgres,
+        - create table in schema defined in `profiles.yml`
+        ```
+        CREATE TABLE "dbtSchema_Arthur20240304".raw_transactions
+        (
+            customer_id smallint,
+            transaction_id character(4)
+        );
+        ```
+        - insert data into created table
+        ```
+        INSERT INTO "dbtSchema_Arthur20240304".raw_transactions (customer_id, transaction_id)
+        VALUES
+            (1, '0023'),
+            (4, '1034');
+        ```
+
 ### Using the starter project
 
 Try running the following commands:
