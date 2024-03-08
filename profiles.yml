@@ -10,3 +10,20 @@ default:
       dbname: (DO NOT VERSION CONTROL SENSITIVE INFO!)
       schema: (DO NOT VERSION CONTROL SENSITIVE INFO!)
       threads: 4
+
+elementary:
+  outputs:
+    default:
+      type: postgres
+      host: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      user: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      password: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      port: 5432
+      dbname: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      schema: (DO NOT VERSION CONTROL SENSITIVE INFO!) # elementary schema, usually [schema name]_elementary
+      threads: 4
+      keepalives_idle: 0 # default 0 seconds
+      connect_timeout: 10 # default 10 seconds
+      # search_path: public # optional, not recommended
+      # role: [optional, set the role dbt assumes when executing queries]
+      # sslmode: [optional, set the sslmode used to connect to the database]

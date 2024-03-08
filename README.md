@@ -23,7 +23,7 @@ pip install -r requirements.txt
 - (optional) Run `dbt debug`, expect final message `All checks passed!` 
     - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud
 
-### Testing Elementary
+### Setup Data Warehouse and Elementary
 - Load data into data warehouse
     - for BigQuery, Databricks, Redshift or Snowflake, see (guides)[https://courses.getdbt.com/courses/take/fundamentals/texts/43380412-setting-up-dbt-cloud-and-your-data-platform]
     - for Postgres,
@@ -78,11 +78,52 @@ pip install -r requirements.txt
 
 - Run `dbt build` to run models and tests, or `dbt test` to run tests only
 
-### Using the starter project
+- Quickstart Elementary per (official guide)[https://docs.elementary-data.com/oss/quickstart/quickstart-cli-package]
+    - when setting up `profiles.yml`, consider "'Least Privilege' Security Principal" test in next section
 
-Try running the following commands:
-- dbt run
-- dbt test
+### Testing Elementary:
+- ("Least Privilege" Security Principal, only needs dedicated role with read-only access to Elementary schema?)[https://docs.elementary-data.com/cloud/general/security-and-privacy]
+    - how to create Postgres read-only role, for Elementary to connect?
+    *instead of Group Role and Login Role, possible to directly grant Privileges to Login Role?*
+        - create a Group Role
+            - to have read-only Privilege to Elementary schema (and nothing else)
+            - to be assigned to a Login Role, created in next step
+        
+        - grant Privileges to created Group Role:
+            - `USAGE` on Elementary schema,
+            - `SELECT` (i.e. read-only) on all tables/views in Elementary schema
+        ```
+        GRANT USAGE ON SCHEMA <Elementary schema name>
+        TO <Group Role>;
+        GRANT SELECT ON ALL TABLES IN SCHEMA <Elementary schema name>
+        TO <Group Role>;
+        ```
+        e.g.
+        ```
+        GRANT USAGE ON SCHEMA "dbtSchema_Arthur20240304_elementary" 
+        TO "read_dbtSchema_Arthur20240304_elementary";
+        GRANT SELECT ON ALL TABLES IN SCHEMA "dbtSchema_Arthur20240304_elementary" 
+        TO "read_dbtSchema_Arthur20240304_elementary";
+        ```
+        - (optional)
+            - `GRANT ... ALL TABLES` also affects views, per (docs)[https://www.postgresql.org/docs/current/sql-grant.html]
+            - (docs on `REVOKE ALL`)[https://www.postgresql.org/docs/current/sql-revoke.html] to reverse `GRANT` e.g.
+            ```
+            REVOKE ALL ON ALL TABLES IN SCHEMA <Schema name> 
+            FROM <Role>;
+            ```
+        
+        - create a Login Role
+            - make it a member of Group Role created earlier
+            - use Role's `user` and `password` for `elementary` profile in `profiles.yml`
+    
+    - TEST: does `edr report` successfully generate a report, when
+    `elementary` profile in `profiles.yml` only has `USAGE` privilege for Elementary schema, and only `SELECT` privileges on all tables/views in that schema, 
+    without any access to all other schemas?
+        - expected: yes
+        - (optional) for Postgres, verify `elementary` profile indeed has no access to all other schemas, by creating a new connection in pgAdmin4 using that profile, and running SQL queries on other schemas. Expected `ERROR: permission denied`.
+
+- would be nice to have actual examples, e.g. does an actual "SQL expression" include "WHERE"? tried it, do not include "WHERE"! https://docs.elementary-data.com/data-tests/anomaly-detection-configuration/where-expression
 
 
 ### Resources:
