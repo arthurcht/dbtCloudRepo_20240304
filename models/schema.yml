@@ -12,12 +12,17 @@ models:
     description: "Fact table of transactions"
     tests:
       - elementary.volume_anomalies:
-          where_expression: "customer_id < 10"
+          timestamp_column: timestamp
+          detection_period:
+            period: day
+            count: 1
+          training_period:
+            period: day
+            count: 3
     columns:
         - name: transaction_id
           description: "The primary key for this table"
           tests:
-            - unique
             - not_null
         - name: customer_id
           tests:

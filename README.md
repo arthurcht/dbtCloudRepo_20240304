@@ -31,17 +31,41 @@ pip install -r requirements.txt
         ```
         CREATE TABLE "dbtSchema_Arthur20240304".raw_transactions
         (
-            customer_id smallint,
-            transaction_id character(4)
+            timestamp timestamp without time zone,
+            transaction_id character(4),
+            customer_id smallint
         );
         ```
         - insert data into created table
         ```
-        INSERT INTO "dbtSchema_Arthur20240304".raw_transactions (customer_id, transaction_id)
+        INSERT INTO "dbtSchema_Arthur20240304".raw_transactions (timestamp, transaction_id, customer_id)
         VALUES
-            (1, '0023'),
-            (4, '1034'),
-            (1, NULL)
+            ('2024-03-08 04:05:06', NULL, 1),
+            ('2024-03-09 04:05:06', '1034', 25),
+            ('2024-03-10 03:26:37', '1008', 3),
+            ('2024-03-10 08:29:16', '0001', 4),
+            ('2024-03-10 11:47:31', '0001', 4),
+            ('2024-03-10 13:47:31', '0001', 4),
+            ('2024-03-10 13:48:31', '0001', 4),
+            ('2024-03-10 13:55:23', '0001', 4),
+            ('2024-03-10 14:32:23', '0001', 4),
+            ('2024-03-10 15:52:23', '0001', 4),
+            ('2024-03-10 16:52:23', '0001', 4),
+            ('2024-03-10 17:43:27', '0201', 13),
+            ('2024-03-10 21:35:46', '2013', 37),
+            ('2024-03-10 22:32:17', '0203', 58),
+            ('2024-03-10 22:34:17', '0203', 58),
+            ('2024-03-10 22:43:17', '0203', 58),
+            ('2024-03-10 22:47:17', '0203', 58),
+            ('2024-03-10 22:52:17', '0203', 58),
+            ('2024-03-10 23:02:17', '0203', 58),
+            ('2024-03-10 23:04:17', '0203', 58),
+            ('2024-03-10 23:14:17', '0203', 58),
+            ('2024-03-10 23:15:17', '0203', 58),
+            ('2024-03-10 23:16:29', '0203', 58),
+            ('2024-03-10 23:23:32', '0203', 58),
+            ('2024-03-10 23:32:17', '0203', 58),
+            ('2024-03-10 23:33:17', '0203', 58),
         ```
 
 - In `models` folder,
@@ -105,6 +129,11 @@ pip install -r requirements.txt
         GRANT SELECT ON ALL TABLES IN SCHEMA "dbtSchema_Arthur20240304_elementary" 
         TO "read_dbtSchema_Arthur20240304_elementary";
         ```
+        - solves error: # TODO fix having to re-grant after every dbt build and edr report?
+        ```
+        Encountered an error while running operation: Database Error
+        permission denied for view <view name>
+        ```
         - (optional)
             - `GRANT ... ALL TABLES` also affects views, per (docs)[https://www.postgresql.org/docs/current/sql-grant.html]
             - (docs on `REVOKE ALL`)[https://www.postgresql.org/docs/current/sql-revoke.html] to reverse `GRANT` e.g.
@@ -123,7 +152,10 @@ pip install -r requirements.txt
         - expected: yes
         - (optional) for Postgres, verify `elementary` profile indeed has no access to all other schemas, by creating a new connection in pgAdmin4 using that profile, and running SQL queries on other schemas. Expected `ERROR: permission denied`.
 
-- would be nice to have actual examples, e.g. does an actual "SQL expression" include "WHERE"? tried it, do not include "WHERE"! https://docs.elementary-data.com/data-tests/anomaly-detection-configuration/where-expression
+- (Anomaly detection tests)[https://docs.elementary-data.com/data-tests/introduction#anomaly-detection-tests]
+    - For each test, data is split into `time buckets` (e.g. 23Mar, 24Mar etc.). For a certain metric (e.g. row count, freshness etc.) a.k.a. `data monitor`, buckets within `detection period` (i.e. more recent) are compared to buckets within `training period` (i.e. less recent). Test fails if anomalies detected, based on anomaly detection method (next).
+    - (Anomaly detection method)[https://docs.elementary-data.com/data-tests/data-anomaly-detection] uses "standard score" a.k.a. "Z-score", representing no. of standard deviations of a value from (historical) average of a set of values
+    - tried "Volume anomalies", statistics of anomaly detection method can be difficult and not intuitive, better-suited for more complex use-cases
 
 
 ### Resources:
