@@ -6,24 +6,14 @@ sources:
     schema: dbtSchema_Arthur20240304
     tables:
       - name: raw_transactions
-
-models:
-  - name: fct_transactions
-    description: "Fact table of transactions"
-    tests:
-      - elementary.volume_anomalies:
-          timestamp_column: timestamp
-          detection_period:
-            period: day
-            count: 1
-          training_period:
-            period: day
-            count: 3
-    columns:
-        - name: transaction_id
-          description: "The primary key for this table"
-          tests:
-            - not_null
-        - name: customer_id
-          tests:
-            - unique
+        columns:
+          - name: timestamp
+            data_type: timestamp without time zone
+          - name: transaction_id
+            data_type: character
+          - name: customer_id
+            data_type: smallint
+        tests:
+          - elementary.schema_changes_from_baseline
+              fail_on_added: true
+              enforce_types: true

@@ -21,11 +21,11 @@ pip install -r requirements.txt
     - if not using Postgres, see [setup instructions](https://docs.getdbt.com/docs/core/connect-data-platform/postgres-setup) for other data warehouses
 
 - (optional) Run `dbt debug`, expect final message `All checks passed!` 
-    - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud
+    - ref: [dbt-labs/jaffle-shop](https://github.com/dbt-labs/jaffle-shop/tree/main) project, project skeleton from results of "initialize project" in dbt Cloud
 
 ### Setup Data Warehouse and Elementary
 - Load data into data warehouse
-    - for BigQuery, Databricks, Redshift or Snowflake, see (guides)[https://courses.getdbt.com/courses/take/fundamentals/texts/43380412-setting-up-dbt-cloud-and-your-data-platform]
+    - for BigQuery, Databricks, Redshift or Snowflake, see [guides](https://courses.getdbt.com/courses/take/fundamentals/texts/43380412-setting-up-dbt-cloud-and-your-data-platform)
     - for Postgres,
         - create table in schema defined in `profiles.yml`
         ```
@@ -102,11 +102,11 @@ pip install -r requirements.txt
 
 - Run `dbt build` to run models and tests, or `dbt test` to run tests only
 
-- Quickstart Elementary per (official guide)[https://docs.elementary-data.com/oss/quickstart/quickstart-cli-package]
+- Quickstart Elementary per [official guide](https://docs.elementary-data.com/oss/quickstart/quickstart-cli-package)
     - when setting up `profiles.yml`, consider "'Least Privilege' Security Principal" test in next section
 
 ### Testing Elementary:
-- ("Least Privilege" Security Principal, only needs dedicated role with read-only access to Elementary schema?)[https://docs.elementary-data.com/cloud/general/security-and-privacy]
+- ["Least Privilege" Security Principal, only needs dedicated role with read-only access to Elementary schema?](https://docs.elementary-data.com/cloud/general/security-and-privacy)
     - how to create Postgres read-only role, for Elementary to connect?
     *instead of Group Role and Login Role, possible to directly grant Privileges to Login Role?*
         - create a Group Role
@@ -135,8 +135,8 @@ pip install -r requirements.txt
         permission denied for view <view name>
         ```
         - (optional)
-            - `GRANT ... ALL TABLES` also affects views, per (docs)[https://www.postgresql.org/docs/current/sql-grant.html]
-            - (docs on `REVOKE ALL`)[https://www.postgresql.org/docs/current/sql-revoke.html] to reverse `GRANT` e.g.
+            - `GRANT ... ALL TABLES` also affects views, per [docs](https://www.postgresql.org/docs/current/sql-grant.html)
+            - [docs on `REVOKE ALL`](https://www.postgresql.org/docs/current/sql-revoke.html) to reverse `GRANT` e.g.
             ```
             REVOKE ALL ON ALL TABLES IN SCHEMA <Schema name> 
             FROM <Role>;
@@ -152,10 +152,65 @@ pip install -r requirements.txt
         - expected: yes
         - (optional) for Postgres, verify `elementary` profile indeed has no access to all other schemas, by creating a new connection in pgAdmin4 using that profile, and running SQL queries on other schemas. Expected `ERROR: permission denied`.
 
-- (Anomaly detection tests)[https://docs.elementary-data.com/data-tests/introduction#anomaly-detection-tests]
+- [Anomaly detection tests](https://docs.elementary-data.com/data-tests/introduction#anomaly-detection-tests)
     - For each test, data is split into `time buckets` (e.g. 23Mar, 24Mar etc.). For a certain metric (e.g. row count, freshness etc.) a.k.a. `data monitor`, buckets within `detection period` (i.e. more recent) are compared to buckets within `training period` (i.e. less recent). Test fails if anomalies detected, based on anomaly detection method (next).
-    - (Anomaly detection method)[https://docs.elementary-data.com/data-tests/data-anomaly-detection] uses "standard score" a.k.a. "Z-score", representing no. of standard deviations of a value from (historical) average of a set of values
+    - [Anomaly detection method](https://docs.elementary-data.com/data-tests/data-anomaly-detection) uses "standard score" a.k.a. "Z-score", representing no. of standard deviations of a value from (historical) average of a set of values
     - tried "Volume anomalies", statistics of anomaly detection method can be difficult and not intuitive, better-suited for more complex use-cases
+
+- [Schema tests](https://docs.elementary-data.com/data-tests/introduction#schema-tests)
+    - TEST: does ["schema changes from baseline" test](https://docs.elementary-data.com/data-tests/schema-tests/schema-changes-from-baseline) work as expected?
+
+    - "Reset" dbt and Elementary project (i.e. DROP (cascade) tables/views in dbt project schema, DROP (cascade) Elementary schema)
+
+    - CREATE source table raw_transactions , then INSERT values
+    ```
+    CREATE TABLE "dbtSchema_Arthur20240304".raw_transactions
+        (
+            timestamp timestamp without time zone,
+            transaction_id character(4),
+            customer_id smallint
+        );
+    INSERT INTO "dbtSchema_Arthur20240304".raw_transactions (timestamp, transaction_id, customer_id)
+        VALUES
+            ('2024-03-08 04:05:06', NULL, 1),
+            ('2024-03-09 04:05:06', '1034', 25),
+            ('2024-03-10 03:26:37', '1008', 3)
+    ```
+    
+    - in `<dbt project directory>/models/schema.yml`, add source table configurations including test `elementary.schema_changes_from_baseline` WITH `columns` configurations and test parameters
+    ```
+    version: 2
+
+    sources:
+    - name: dbtSchema_Arthur20240304
+        database: postgres
+        schema: dbtSchema_Arthur20240304
+        tables:
+        - name: raw_transactions
+            columns:
+            - name: timestamp
+                data_type: timestamp without time zone
+            - name: transaction_id
+                data_type: character
+            - name: customer_id
+                data_type: smallint
+            tests:
+            - elementary.schema_changes_from_baseline:
+                fail_on_added: true
+                enforce_types: true
+    ```
+    - run `dbt build` for Elementary schema
+    - GRANT privileges to Elementary schema (i.e. `USAGE` on schema and `SELECT` on all tables/views, see example in first test "'Least Privilege' Security Principal" above)
+    - run `edr report` to verify `raw_transactions` source table is being monitored and tested for `schema_changes_from_baseline`
+
+    - ADD column into `raw_transactions` source table, that is not defined in `schema.yml` - this is **expected to fail test `schema_changes_from_baseline`**, with parameter `"fail_on_added":true`
+    ```
+    ALTER TABLE "dbtSchema_Arthur20240304".raw_transactions
+    ADD is_paid boolean;
+    ```
+    - run `dbt build`, GRANT privileges to Elementary schema, then run `edr report` - **expected `schema_changes_from_baseline` test to fail**
+
+    - (optional) [docs on this test](https://docs.elementary-data.com/data-tests/schema-tests/schema-changes-from-baseline) suggest auto-generate baseline schema, but macro does not work as expected and seems redundant, see [Github issue](https://github.com/elementary-data/elementary/issues/1455)
 
 
 ### Resources:
