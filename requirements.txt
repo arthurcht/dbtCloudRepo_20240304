@@ -1,2 +1,2 @@
 dbt-core
-dbt-postgres  # replace based on your data warehouse
+dbt-synapse @ git+https://github.com/microsoft/dbt-synapse@d26c475fb8101b62f456f40f20cd0235e3604aed  # replace based on your data warehouse

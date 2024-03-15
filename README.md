@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 - Setup `profiles.yml` to connect to data warehouse
     - DO NOT VERSION CONTROL SENSITIVE INFO! see [`profiles.yml` best practices](https://docs.getdbt.com/docs/core/connect-data-platform/connection-profiles)
-    - if not using Postgres, see [setup instructions](https://docs.getdbt.com/docs/core/connect-data-platform/postgres-setup) for other data warehouses
+    - if not using Postgres, see [setup instructions](https://docs.getdbt.com/docs/core/connect-data-platform/postgres-setup) for other data warehouses (e.g. for [Microsoft Azure Synapse](https://docs.getdbt.com/docs/core/connect-data-platform/azuresynapse-setup))
 
 - (optional) Run `dbt debug`, expect final message `All checks passed!` 
     - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud

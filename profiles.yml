@@ -2,11 +2,12 @@ default:
   target: dev
   outputs:
     dev:
-      type: postgres
-      host: (DO NOT VERSION CONTROL SENSITIVE INFO!)
-      user: (DO NOT VERSION CONTROL SENSITIVE INFO!)
-      password: (DO NOT VERSION CONTROL SENSITIVE INFO!)
-      port: 5432
-      dbname: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      type: synapse
+      driver: 'ODBC Driver 18 for SQL Server'
+      server: (DO NOT VERSION CONTROL SENSITIVE INFO!) # (Dedicated SQL endpoint of your workspace here)
+      port: 1433
+      database: (DO NOT VERSION CONTROL SENSITIVE INFO!)
+      authentication: sql
       schema: (DO NOT VERSION CONTROL SENSITIVE INFO!)
-      threads: 4
+      user: sqladminuser
+      password: (DO NOT VERSION CONTROL SENSITIVE INFO!)
