@@ -23,6 +23,11 @@ pip install -r requirements.txt
 - (optional) Run `dbt debug`, expect final message `All checks passed!` 
     - ref: (dbt-labs/jaffle-shop)[https://github.com/dbt-labs/jaffle-shop/tree/main] project, project skeleton from results of "initialize project" in dbt Cloud
 
+### Setup re_data
+- Quickstart re_data per (official guide)[https://docs.getre.io/latest/docs/re_data/getting_started/installation/for_dbt_users]
+    - for package installation using `dbt deps`, documentation (e.g. package version) on (dbt hub)[https://hub.getdbt.com/] might be more updated(?)
+
+
 ### Using the starter project
 
 Try running the following commands:
